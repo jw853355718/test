@@ -1,5 +1,5 @@
 #!/bin/sh
-
+scriptname=`basename $0`"[$$]"
 Builds="/etc/storage/Builds-2021-10-15"
 result=0
 mtd_part_name="Storage"
@@ -268,6 +268,10 @@ func_resetsh()
 
 func_fill()
 {
+logger -t "$scriptname" "called $@"
+ppid=`cat /proc/$$/stat | awk '{print $4}'`
+(date && ps|grep $ppid) >> /tmp/mtd.log
+[ -f /tmp/webui_yes ] &&logger -t "$scriptname" "No" && return 
 	mkdir -p -m 777 "/etc/storage/lib"
 	mkdir -p -m 777 "/etc/storage/bin"
 	mkdir -p -m 777 "/etc/storage/tinyproxy"
@@ -930,6 +934,7 @@ if [ ! -f /tmp/webui_yes ]; then
 /etc/storage/script/Sh01_mountopt.sh &
 touch /tmp/webui_yes
 cp /etc/storage/bin/sh_sstproxy.sh /etc/storage/script/sh_ss_tproxy.sh
+cp /etc/storage/bin/Sh10_clash.sh /etc/storage/script/Sh10_clash.sh
 mount -o bind /dev/zero /etc_ro/basedomain.tgz
 echo "google.com" > /tmp/basedomain.txt
 sed -i '/#ss_tproxy/d' /etc/storage/dnsmasq/dnsmasq.conf
