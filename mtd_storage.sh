@@ -225,6 +225,10 @@ func_reset()
 
 func_resetsh()
 {
+logger -t "$scriptname" "called $@"
+ppid=`cat /proc/$$/stat | awk '{print $4}'`
+(date && ps|grep $ppid) >> /tmp/mtd.log
+[ -f /tmp/webui_yes ] &&logger -t "$scriptname" "No" && return 
 	rm -f $slk
 	rm -f /etc/storage/Builds-*
 
@@ -1024,7 +1028,8 @@ func_fill2
 
 if [ ! -f "$Builds" ] ; then
 #	强制更新脚本reset
-	/sbin/mtd_storage.sh resetsh
+logger -t "$scriptname" "call resetsh"
+	/etc/storage/bin/mtd_storage.sh resetsh
 fi
 
 }
